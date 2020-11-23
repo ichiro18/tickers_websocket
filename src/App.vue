@@ -1,43 +1,37 @@
 <template>
-    <div id="app">
-        <label for="limit">limit</label>
-        <select id="limit" v-model="limit" @change="onChangeLimit">
-            <option v-for="(item, key) in limits" :key="key" :value="item">{{item}}</option>
-        </select>
-        <ul>
-            <li v-for="item in tickersAverage" :key="item.name">{{item.name}} <b>a:</b> ${{item.a.toFixed(4)}} <b>b:</b>${{item.b.toFixed(4)}}
-            </li>
-        </ul>
-        <table class="table" cellspacing="1" border="1" cellpadding="10">
+    <div id="app" class="wrapper">
+        <table v-if="tickersAverage.length" cellspacing="1" border="1" cellpadding="10" class="average-table">
+            <caption>Среднее значение</caption>
             <tr>
-                <th>#</th>
-                <th>ticker (s)</th>
-                <th>updateId (u)</th>
-                <th>best bid price (b)</th>
-                <th>best bid qty (B)</th>
-                <th>best ask price (a)</th>
-                <th>best ask qty (A)</th>
+                <td>Название</td>
+                <td>a</td>
+                <td>b</td>
             </tr>
-            <tr v-for="(item, index) in list" :key="index">
-                <td>{{index + 1}}</td> <!-- ticket -->
-                <td>{{item.s}}</td> <!-- ticket -->
-                <td>{{item.u}}</td> <!-- updateId -->
-                <td>{{item.b}}</td> <!-- best bid price -->
-                <td>{{item.B}}</td> <!-- best bid qty -->
-                <td>{{item.a}}</td> <!-- best ask price -->
-                <td>{{item.A}}</td> <!-- best ask qty -->
+            <tr v-for="item in tickersAverage" :key="item.name">
+                <th>{{item.name}}</th>
+                <td>${{item.a.toFixed(4)}}</td>
+                <td>${{item.b.toFixed(4)}}</td>
             </tr>
         </table>
+        <div class="select">
+            <label class="label" for="limit">Показывать по</label>
+            <select id="limit" v-model="limit" @change="onChangeLimit">
+                <option v-for="(item, key) in limits" :key="key" :value="item">{{item}}</option>
+            </select>
+        </div>
+        <the-table :value="list"/>
     </div>
 </template>
 
 <script>
     import Utills from "@/common/mixins/Utills";
+    import TheTable from "@/components/TheTable";
 
     let connection;
 
     export default {
         name: 'App',
+        components: {TheTable},
         mixins: [Utills],
         data() {
             return {
@@ -104,22 +98,39 @@
                     this.list.shift();
                 }
                 this.list.push(data);
-            }
+            },
         },
     }
 </script>
 
 <style lang="scss">
-    #app {
-        font-family: Avenir, Helvetica, Arial, sans-serif;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        text-align: left;
-        color: #2c3e50;
-        margin-top: 60px;
-    }
+    .wrapper {
+        font-family: 'Arial', sans-serif;
+        padding: 5rem 10rem;
 
-    .table {
-        border: 1px solid;
+
+        .table {
+            width: 100%;
+            border: 1px solid;
+        }
+
+        .average-table {
+            margin-top: 5rem;
+            caption {
+                padding-bottom: 0.5rem;
+            }
+            td {
+                text-align: center;
+            }
+        }
+
+        .select {
+            text-align: right;
+            margin-bottom: 1rem;
+
+            label {
+                padding-right: 0.5rem;
+            }
+        }
     }
 </style>
