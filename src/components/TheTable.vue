@@ -1,6 +1,6 @@
 <template>
     <div class="the-table">
-        <table class="table is-bordered is-fullwidth" :class="[`is-${config.columns}`]" v-if="items.length">
+        <table class="table is-bordered is-fullwidth" :class="[`is-${config.columns}`]" v-if="list.length">
             <thead>
             <tr>
                 <th :colspan="this.config.columns"><the-input v-model="title" type="textarea"/></th>
@@ -15,20 +15,14 @@
                         @click="select(cellIndex, rowIndex)"
                 >
                     <template v-if="helpers.isEqual(selected,[cellIndex, rowIndex])">
-                        <the-input v-model="items[rowIndex][cellIndex]" type="textarea"/>
+                        <the-input v-model="list[rowIndex][cellIndex]" type="textarea"/>
                     </template>
                     <span v-else>{{ cell }}</span>
                 </td>
             </tr>
             </tbody>
         </table>
-        <div class="table-creator" v-else>
-            <h4>Создать таблицу</h4>
-            <the-input v-model.number="config.columns" type="number" label="Column count" />
-            <the-input v-model.number="config.rows" type="number" label="Row count" />
-            <button class="button is-info" @click="createTable">Создать</button>
-        </div>
-        <div class="table-controls" v-if="items.length">
+        <div class="table-controls" v-if="list.length">
             <button class="button control-item" @click="createRow">
                 <span class="icon">
                   <i class="far fa-plus-square"></i>
@@ -72,17 +66,16 @@
                 default: '0',
             },
             value: {
-                type:    Object,
+                type:    Array,
                 default: () => ({
-                    title:  '',
-                    items: [],
+                    list: [],
                 }),
             },
         },
         data() {
             return {
                 title:   '',
-                items:   [],
+                list:   [],
                 config: {
                     columns: 0,
                     rows:    0,
@@ -94,30 +87,25 @@
             };
         },
         methods: {
-            createTable() {
-                const rowsCount = this.config.rows || 1;
-                const columnsCount = this.config.columns || 1;
-                this.items = Array.from(Array(rowsCount), x => Array(columnsCount).fill(''));
-            },
             createRow() {
                 const columnsCount = this.config.columns || 1;
-                this.items.push(Array(columnsCount).fill(''));
+                this.list.push(Array(columnsCount).fill(''));
                 this.config.rows += 1;
             },
             createColumn() {
-                for (const item of this.items) {
+                for (const item of this.list) {
                     item.push('');
                 }
                 this.config.columns += 1;
             },
             deleteColumn() {
-                for (const item of this.items) {
+                for (const item of this.list) {
                     item.splice(-1, 1);
                 }
                 this.config.columns -= 1;
             },
             deleteRow() {
-                this.items.splice(this.selected[1], 1);
+                this.list.splice(this.selected[1], 1);
                 this.config.rows -= 1;
             },
             select(row, column) {
@@ -128,12 +116,11 @@
             value: {
                 immediate: true,
                 handler(val) {
-                    this.title = val.title;
-                    this.items = val.items;
-                    if (this.items.length) {
+                    this.list = val.list;
+                    if (this.list.length) {
                         this.config = {
-                            rows:    this.items.length || 0,
-                            columns: this.items[0].length || 0,
+                            rows:    this.list.length || 0,
+                            columns: this.list[0].length || 0,
                         };
                     }
                 },
