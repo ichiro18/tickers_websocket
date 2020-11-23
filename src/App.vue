@@ -1,18 +1,43 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+ <the-table/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+// import TheTable from '@/components/TheTable.vue'
 
+import TheTable from "@/components/TheTable";
 export default {
   name: 'App',
   components: {
-    HelloWorld
-  }
+      TheTable
+    // TheTable
+  },
+  data() {
+    return {
+      bitcoin: [],
+      connection: null
+    }
+  },
+  created() {
+    console.log("Starting connection to WebSocket Server");
+    this.connection = new WebSocket("wss://stream.binance.com:9443/stream?streams=btcusdt@bookTicker/ethusdt@bookTicker/bnbusdt@bookTicker");
+
+    this.connection.onmessage = (event) => {
+        if (this.bitcoin.length < 100) {
+            this.bitcoin.push(event.data);
+            console.log(event.data);
+        }
+        console.log('onmessage');
+      console.log(event);
+    };
+    this.connection.onopen = function(event) {
+      console.log('onopen');
+      console.log(event);
+      console.log("Successfully connected to the echo websocket server...")
+    }
+  },
 }
 </script>
 
