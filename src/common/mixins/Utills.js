@@ -8,11 +8,6 @@
 export default {
     methods: {
         /**
-         * Creates a throttled function that only invokes `func` at most once per
-         * every `wait` milliseconds (or once per browser frame).
-         * The `func` is invoked with the last arguments provided to the
-         * throttled function. Subsequent calls to the throttled function return the
-         * result of the last `func` invocation.
          * @param {Function} func The function to throttle.
          * @param {Number} [wait=0] The number of milliseconds to throttle invocations to
          * @return {Function} Returns the new throttled function.
@@ -20,12 +15,12 @@ export default {
         throttle(func, wait) {
             let now, lastExec, timer, context, args;
 
-            const execute = function() {
+            const execute = function () {
                 func.apply(context, args);
                 lastExec = now;
             };
 
-            return function() {
+            return function () {
                 context = this;
                 args = arguments;
 
@@ -50,5 +45,28 @@ export default {
                 }
             };
         },
+        /**
+         * @param {Function} func The function to throttle.
+         * @param {Number} [wait=0] The number of milliseconds to throttle invocations to
+         * @return {Function} Returns the new throttled function.
+         */
+        debounce(func, wait) {
+            let isCooldown, context, args;
+
+            return function () {
+                context = this;
+                args = arguments;
+
+                if (isCooldown) return;
+
+                func.apply(context, args);
+
+                isCooldown = true;
+
+                setTimeout(() => {
+                    isCooldown = false;
+                }, wait);
+            };
+        }
     },
 };
